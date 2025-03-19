@@ -1,12 +1,20 @@
-TARGET := lab_04.elf
+TARGET := app.elf
+OUT_DIR := out
+SRCS := $(wildcard ./*.asm)
+OBJS := $(SRCS:./%.asm=$(OUT_DIR)/%.o)
 
+all : $(TARGET)
 
-all: $(TARGET)
+%.elf : $(OBJS)
+	ld $^ -o $@
 
-	
-%.elf: %.asm
+$(OUT_DIR)/%.o : ./%.asm | $(OUT_DIR)
 	fasm $< $@
-	chmod +x $@
 
-clean:
-	rm $(TARGET)
+$(OUT_DIR) :
+	mkdir -p $@
+
+clean :
+	$(RM) ./*.elf $(OUT_DIR)/*
+
+.PHONY : clean

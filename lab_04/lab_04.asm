@@ -6,8 +6,10 @@
 ; rdi	; 1st param
 ; eax	; syscall_number
 
-format ELF64 executable 3
-entry main
+format ELF64 
+public _start    
+
+maxlen equ 9
 
 macro syscall1 a ; макрос сискола из 1 аргумента (номера функции)
 {
@@ -50,7 +52,7 @@ macro exit code ; макрос осуществляет выход из прог
 }
 
 
-segment readable executable
+section '.text' executable
 
 read_num: ; функция читает число в r9b и пропускает один символ
     syscall4 0x0,0,byte_buf,1
@@ -131,8 +133,8 @@ print_matr: ; функция печатает матрицу в переменн
         cmp r12b,0
         ja .row_loop
     ret
-    
-main: ; точка входа
+
+_start: ; точка входа
     call read_dims
     
     call read_matr
@@ -143,9 +145,8 @@ main: ; точка входа
     
     exit 0
 
-segment readable
 
-maxlen equ 9
+section '.rodata'
 
 in_rows db 'Введите количество строк матрицы от 1 до 9:', 10
 in_rows_size = $-in_rows
@@ -159,7 +160,8 @@ in_matr_size = $-in_matr
 out_matr db 'Получившаяся матрица:', 10
 out_matr_size = $-out_matr
 
-segment readable writeable
+
+section '.bss' writeable
 
 rows db ?
 cols db ?
