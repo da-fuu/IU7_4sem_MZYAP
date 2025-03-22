@@ -54,13 +54,13 @@ macro syscall4 a,b,c,d ; макрос сискола из 4 аргументов
 
 macro print msg ; макрос печатает строку, аргумент - указатель на строку, обязана быть переменная с названием ptr_size
 {
-	syscall4 0x1,1,msg,msg#_size
-}
-
-macro write chr ; макрос печатает один символ, аргумент - однобайтный регистр или константа
-{
-    mov [byte_buf],chr
-	syscall4 0x1,1,byte_buf,1
+    push rbx
+    mov rbx,msg
+    push rcx
+    mov rcx,msg#_size
+    call print_str
+	pop rcx
+	pop rbx
 }
 
 macro exit code ; макрос осуществляет выход из программы, аргумент - код возврата
@@ -107,13 +107,26 @@ macro endfor reg
 
 section '.text' executable
 
-read_num: ; функция читает число в rdx и пропускает один символ
-    syscall4 0x0,0,byte_buf,1
-    movzx rdx,[byte_buf]
-    sub rdx,'0'
+read_char:
     syscall4 0x0,0,byte_buf,1
     ret
 
+read_num: ; функция читает число в rdx и пропускает один символ
+    call read_char
+    movzx rdx,[byte_buf]
+    sub rdx,'0'
+    call read_char
+    ret
+    
+write_char:
+    mov [byte_buf],dl
+    syscall4 0x1,1,byte_buf,1
+    ret
+    
+print_str:
+	syscall4 0x1,1,rbx,rcx
+    ret
+        
 read_dims: ; функция читает колчество строк и столбцов в переменные rows и cols
     print in_rows
     call read_num
@@ -137,7 +150,6 @@ read_matr: ; функция читает матрицу в переменную 
     ret
     
 exchange_elems: ; функция изменяет матрицу в переменной matrix по заданию
-    
     mov rax,[cols]
     mov cl,2
     div cl
@@ -165,10 +177,13 @@ print_matr: ; функция печатает матрицу в переменн
         for rdi,0,[cols]
             getelem rsi,rdi,dl
             add dl,'0'
-            write dl
-            write ' ' 
+            call write_char
+            mov dl,' ' 
+            call write_char
+            
         endfor rdi
-        write newline  
+        mov dl,newline  
+        call write_char
     endfor rsi 
         
     ret
