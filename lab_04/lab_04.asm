@@ -74,7 +74,7 @@ macro getaddr row,col ; сохраняет адрес элемента в rbx
     lea rbx,[matrix+rbx+col]
 }
 
-macro getelem row,col,out
+macro getelem row,col,out ; записывает элемент по индексам из первых 2 операндов в третий операнд
 {
     push rbx
     getaddr row,col
@@ -82,7 +82,7 @@ macro getelem row,col,out
     pop rbx
 }
 
-macro setelem row,col,in
+macro setelem row,col,in ; записывает в элемент по индексам из первых 2 операндов третий операнд
 {
     push rbx
     getaddr row,col
@@ -90,14 +90,14 @@ macro setelem row,col,in
     pop rbx
 }
 
-macro for reg,start,stop
+macro for reg,start,stop ; начало c-style цикла
 {
     mov reg,start
     .#reg#_again:
     cmp reg, stop
     jge .#reg#_over
 }
-macro endfor reg
+macro endfor reg ; конец c-style цикла
 {
     inc reg
     jmp .#reg#_again
@@ -107,7 +107,7 @@ macro endfor reg
 
 section '.text' executable
 
-read_char:
+read_char: ; функция чтения символа в буфер
     syscall4 0x0,0,byte_buf,1
     ret
 
@@ -118,12 +118,12 @@ read_num: ; функция читает число в rdx и пропускае�
     call read_char
     ret
     
-write_char:
+write_char: ; функция печати символа из dl
     mov [byte_buf],dl
     syscall4 0x1,1,byte_buf,1
     ret
     
-print_str:
+print_str: ; вспомогательная функция для макроса печати строки
 	syscall4 0x1,1,rbx,rcx
     ret
         
