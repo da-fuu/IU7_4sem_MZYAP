@@ -104,6 +104,11 @@ macro endfor reg ; конец c-style цикла
     .#reg#_over:
 }
 
+macro store_str name,str&
+{
+    name db str, newline
+    name#_size = $-name
+}
 
 section '.text' executable
 
@@ -202,17 +207,13 @@ _start: ; точка входа
 
 section '.rodata'
 
-in_rows db 'Введите количество строк матрицы от 1 до ', maxlen_str, ':', newline
-in_rows_size = $-in_rows
+store_str in_rows,'Введите количество строк матрицы от 1 до ', maxlen_str, ':'
 
-in_cols db 'Введите количество столбцов матрицы от 1 до ', maxlen_str, ':', newline
-in_cols_size = $-in_cols
+store_str in_cols,'Введите количество столбцов матрицы от 1 до ', maxlen_str, ':'
 
-in_matr db 'Введите элементы матрицы - цифры через 1 разделитель:', newline
-in_matr_size = $-in_matr
+store_str in_matr,'Введите элементы матрицы - цифры через 1 разделитель:'
 
-out_matr db 'Получившаяся матрица:', newline
-out_matr_size = $-out_matr
+store_str out_matr,'Получившаяся матрица:'
 
 
 section '.bss' writeable
