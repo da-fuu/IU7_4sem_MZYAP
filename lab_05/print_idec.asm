@@ -34,7 +34,10 @@ write_udec_number: ; печатет число из al
     
     ret
 
-write_idec_number: ; печатет число в допкоде из al
+write_idec_number: ; печатет число в допкоде из al  
+    cmp al, 0
+    je write_udec_number.one_digit
+
     mov dl, al
     
     mov cl, 10
@@ -49,19 +52,31 @@ write_idec_number: ; печатет число в допкоде из al
     mov [answer], '+'
     cmp dl, 0
     jge .positive
+
     mov [answer], '-'
     neg [answer+1]
     neg [answer+2]
     neg [answer+3]
 
     .positive:
+    mov rcx, answer_size
     add [answer+1], '0'
     add [answer+2], '0'
     add [answer+3], '0'
     mov [answer+4], newline
-    print_str answer
 
-    ret
+    .rm_zero:
+    cmp [answer+1], '0'
+    jne .print
+    dec rcx
+    shr dword [answer+1], 8
+    jmp .rm_zero
+
+    .print:
+    mov rbx, answer
+    call print_str_func
+
+    ret   
 
 print_byte_idec:
     cmp [is_init], 1
@@ -77,9 +92,9 @@ print_byte_idec:
 
 
 section '.rodata' 
-    store_str print_idec_str, 'Младший байт числа как знаковое число в десятиричной СС:'
+    store_str print_idec_str, 'Младший байт числа как знаковое число в десятичной СС:'
 
-section '.data'
+section '.data' writable
     answer db 5 dup ?
     answer_size = $-answer
 

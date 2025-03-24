@@ -17,6 +17,7 @@ print_num:
     bsf ax, [number]
     jnz .normal
     print_str zero_error_str
+    ret
     .normal:
     call write_udec_number
     ret

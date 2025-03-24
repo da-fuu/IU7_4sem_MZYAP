@@ -58,4 +58,4 @@ print_full_uhex:
 
 
 section '.rodata' 
-    store_str print_full_uhex_str, 'Полное беззнаковое число в шестнадцатиричной СС:'
+    store_str print_full_uhex_str, 'Полное беззнаковое число в шестнадцатеричной СС:'
