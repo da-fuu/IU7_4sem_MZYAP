@@ -2,7 +2,6 @@ format ELF64
 
 public print_full_uhex
 
-extrn print_str_func
 extrn write_char
 extrn number word
 extrn is_init byte

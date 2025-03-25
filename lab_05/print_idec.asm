@@ -5,7 +5,6 @@ public write_udec_number
 
 
 extrn write_char
-extrn print_str_func
 extrn number word
 extrn is_init byte
 

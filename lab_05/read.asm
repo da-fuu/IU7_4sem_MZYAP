@@ -2,7 +2,6 @@ format ELF64
 
 public read_num
 
-extrn print_str_func
 extrn read_char
 extrn number word
 extrn is_init byte

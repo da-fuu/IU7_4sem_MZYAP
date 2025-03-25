@@ -59,7 +59,9 @@ macro print_str msg ; макрос печатает строку, аргумен
 if ~ defined is_def
     extrn no_num_error_str
     extrn no_num_error_str_size
+    extrn print_str_func
 else 
     public no_num_error_str
     public no_num_error_str_size
+    public print_str_func
 end if

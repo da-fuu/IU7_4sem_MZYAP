@@ -12,7 +12,6 @@ public _start
 public number
 public is_init
 
-extrn print_str_func
 extrn read_char
 extrn exit
 extrn read_num
@@ -37,9 +36,16 @@ print_menu:
 
 read_digit_num: ; функция читает число в rdx и пропускает один символ
     call read_char
+    mov dh, -1
+    cmp dl, newline
+    je .exit
     sub dl, '0'
     mov dh, dl
     call read_char
+    cmp dl, newline
+    je .exit
+    mov dh, -1
+    .exit:
     mov dl, dh
     ret
 
@@ -91,7 +97,7 @@ store_str read_num_str, '1. Ввести беззнаковое число в д
 store_str print_full_uhex_str, '2. Вывести полное беззнаковое число в шестнадцатеричной СС'
 store_str print_byte_idec_str, '3. Вывести младший байт числа как знаковое число в десятичной СС'
 store_str print_two_pow_divisor_str, '4. Вывести максимальную степень двойки, которой кратно число'
-store_str neg_menu_str, 'Пункт меню должен быть цифрой!'
+store_str neg_menu_str, 'Ошибка ввода пункта меню!'
 store_str big_menu_str, 'Пункт меню не может быть больше ', funcs_max_str, '!'
 
 

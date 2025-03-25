@@ -1,6 +1,5 @@
 format ELF64 
 
-public print_str_func
 public read_char
 public write_char
 

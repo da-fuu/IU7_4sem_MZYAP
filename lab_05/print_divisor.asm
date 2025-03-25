@@ -2,7 +2,6 @@ format ELF64
 
 public print_two_pow_divisor
 
-extrn print_str_func
 extrn write_udec_number
 extrn number word
 extrn is_init byte
