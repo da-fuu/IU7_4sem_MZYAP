@@ -22,7 +22,6 @@ __asm__(
         );
 }
 
-
 int main(void)
 {
     const char *str = "rvjvj";

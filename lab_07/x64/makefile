@@ -13,7 +13,7 @@ $(OUT_DIR)/%.o : ./%.asm | $(OUT_DIR)
 	fasm $< $@
 
 $(OUT_DIR)/%.o : ./%.c | $(OUT_DIR)
-	gcc --std=c99 -Wall -Wpedantic -Wextra -Wno-return-type -Wno-unused-parameter -masm=intel -c $< -o $@
+	gcc --std=c99 -Wall -Wpedantic -Wextra -Wno-return-type -Wno-unused-parameter -g -O0 -masm=intel -c $< -o $@
 
 $(OUT_DIR) :
 	mkdir -p $@

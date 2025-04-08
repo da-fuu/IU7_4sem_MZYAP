@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+extern void copy(char *out, const char *in, int length);
+
 int len(const char *str)
 {
 __asm__(
@@ -17,8 +19,6 @@ __asm__(
         "ret\n"
         );
 }
-
-extern void copy(char *out, const char *in, int length);
 
 int main(void)
 {
