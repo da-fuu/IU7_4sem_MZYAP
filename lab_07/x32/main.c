@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-extern void copy(char *out, const char *in, int length);
+extern void copy(char *out, const char *in, size_t length);
 
-int len(const char *str)
+size_t len(const char *str)
 {
 __asm__(
         "mov al, 0\n"
@@ -24,13 +24,13 @@ __asm__(
 
 int main(void)
 {
-    const char *str = "rvjvj";
-    int my_len = len(str);
-    printf("Библиотека: %d\nМоё: %d\n", (int)strlen(str), my_len);
+    const char *str = "Test string";
+    size_t my_len = len(str);
+    printf("Длина: %zu\nМоей функцией: %zu\n", strlen(str), my_len);
 
     char *new_str = malloc(my_len * sizeof(char));
     copy(new_str, str, my_len);
     printf("Начальная строка: %s\nКопия: %s\n", str, new_str);
-
+    free(new_str);
     return 0;
 }

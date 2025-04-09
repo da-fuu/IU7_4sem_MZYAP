@@ -2,4 +2,8 @@
 *.elf
 *.o
 *.tmp
+*.OBJ
+*.EXE
+!/*.EXE
 .idea
+/.directory

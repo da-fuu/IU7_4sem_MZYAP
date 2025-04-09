@@ -1,15 +1,14 @@
-TIMEOUT = 01b shl 5
-START_INTERVAL equ 1Fh
+AUTOREP_DELAY = 01b shl 5
+START_AUTOREP_VAL = 1Fh
 INTERVAL_MS = 500
 INTERVAL_TICS = INTERVAL_MS * 18 / 1000
 
 CSEG SEGMENT para public 'CODE'
 assume CS:CSEG
 	time db INTERVAL_TICS
-	value db START_INTERVAL
+	value db START_AUTOREP_VAL
 	old_handler dd ?
 handler:
-
 	inc time
 	cmp time, INTERVAL_TICS
 	jle end_handler
@@ -19,13 +18,13 @@ handler:
 	out 60h, al
 
 	mov al, value
-	or al, TIMEOUT
+	or al, AUTOREP_DELAY
 	out 60h, al
 
 	dec value
 	cmp value, -1
 	jge end_handler
-	mov value, START_INTERVAL
+	mov value, START_AUTOREP_VAL
 end_handler:
 	jmp dword ptr old_handler
 
@@ -39,7 +38,7 @@ main:
 
 	mov ah, 25h
 	mov al, 1Ch
-	mov dx, CSEG
+	mov dx, cs
 	mov ds, dx
 	mov dx, handler
 	int 21h
@@ -47,6 +46,7 @@ main:
 	mov ah, 31h
 	mov al, 0
 	mov dx, main
+	add dx, 0Fh
 	.386
 	shr dx, 4
 	.8086
