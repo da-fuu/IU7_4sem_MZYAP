@@ -6,4 +6,5 @@
 *.EXE
 !/*.EXE
 .idea
+.vscode
 /.directory

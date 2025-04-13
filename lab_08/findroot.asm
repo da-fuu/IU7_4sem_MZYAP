@@ -1,6 +1,7 @@
 format ELF64 
 public main
 extrn printf
+extrn scanf
 
 
 newline equ 10
@@ -62,6 +63,7 @@ macro exit rc
 
 
 section '.text' executable
+
 print_res: ; вызывает принтф, передает один double из st0, в rdi - указатель на строку форматирования
     sub rsp, 8
     fstp qword [rsp]
@@ -71,55 +73,91 @@ print_res: ; вызывает принтф, передает один double и�
     add rsp, 8
     ret
 
+
+read_params:
+    sub rsp, 8
+
+    print_str func
+    print_str input_start
+
+    mov rdi, lf_format
+    mov rsi, start
+    call scanf
+    cmp rax, 1
+    jne .error
+
+    print_str input_stop
+
+    mov rdi, lf_format
+    mov rsi, stop
+    call scanf
+    cmp rax, 1
+    jne .error
+
+    print_str input_iters
+    
+    mov rdi, d_format
+    mov rsi, iters
+    call scanf
+    cmp rax, 1
+    jne .error
+
+    mov rax, 0
+    jmp .end
+    .error:
+    mov rax, 1
+    .end:
+    add rsp, 8
+    ret
+
+
+find_root:
+    sub rsp, 8
+    fld qword [start]
+    fld qword [stop]
+    faddp
+
+
+    mov rdi, output_ans
+    call print_res
+
+    mov rax, 0
+    add rsp, 8
+    ret
+
+
 main:
     sub rsp, 8
 
-    fld [PI_BAD]
-    fsin
-    mov rdi, bad
-    call print_res
+    call read_params
+    cmp rax, 0
+    je .ok_read
+    print_str input_error
+    jmp .end
+    .ok_read:
 
-    fld [PI_MID]
-    fsin
-    mov rdi, mid
-    call print_res
+    call find_root
 
-    fldpi
-    fsin
-    mov rdi, best
-    call print_res
-
-
-    fld [PI_BAD]
-    fdiv [TWO]
-    fsin
-    mov rdi, bad2
-    call print_res
-
-    fld [PI_MID]
-    fdiv [TWO]
-    fsin
-    mov rdi, mid2
-    call print_res
-
-    fldpi
-    fdiv [TWO]
-    fsin
-    mov rdi, best2
-    call print_res
-
+    .end:
     add rsp, 8
-    exit 0
+    exit rax
+
+
+section '.bss' writable
+    start dq ?
+    stop dq ?
+    iters dd ?
+
 
 section '.rodata'
-    PI_BAD dt 3.14
-    PI_MID dt 3.141596
+    store_str func, 'Функция к поиску корня: ...'
+    store_str input_start, 'Введите начало отрезка: '
+    store_str input_stop, 'Введите конец отрезка: '
+    store_str input_iters, 'Введите количество итераций: '
+    store_str nl, ''
+    store_str input_error, 'Ошибка ввода!'
+    store_str output_ans, 'Найденный корень уравнения: %lf'
 
-    TWO dq 2.0
+    lf_format db '%lf', 0
+    d_format db '%d', 0
 
-    store_str bad, 'Результат вычисления sin(pi) для 3.14: %.10lf'
-    store_str mid, 'Результат вычисления sin(pi) для 3.141596: %.10lf'
-    store_str best, 'Результат вычисления sin(pi) для встроенного значения: %.10lf'
-    store_str bad2, 'Результат вычисления sin(pi/2) для 3.14: %.10lf'
-    store_str mid2, 'Результат вычисления sin(pi/2) для 3.141596: %.10lf'
-    store_str best2, 'Результат вычисления sin(pi/2) для встроенного значения: %.10lf'
