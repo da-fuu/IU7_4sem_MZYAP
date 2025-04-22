@@ -32,7 +32,7 @@ macro pass_rect r
 section '.text' executable
 
 main:
-    sub rsp, 8
+    push rbp
     mov rdi, 700
     mov rsi, 200
     mov rdx, name
@@ -57,13 +57,12 @@ main:
 
     .exit:
     call CloseWindow
-    add rsp, 8
-    mov rdi, 0
-    mov rax, 0x3C
-	syscall
+    pop rbp
+    mov rax, 0
+	ret
 
 mainloop:
-    sub rsp, 8
+    push rbp
 
     mov rdi, 0
     mov rsi, 16
@@ -110,7 +109,7 @@ mainloop:
     pass_rect output_rect
     call GuiLabel
 
-    add rsp, 8
+    pop rbp
     ret
 
 
