@@ -5,7 +5,7 @@ OBJS := $(SRCS:./%.asm=$(OUT_DIR)/%.o)
 all : app.elf
 
 app.elf : $(OBJS)
-	gcc $^ -L. -lraylib -lraygui -lm -no-pie -o $@
+	gcc $^ -L. -lraylib -lraygui -lm -o $@
 
 $(OUT_DIR)/%.o : ./%.asm | $(OUT_DIR)
 	fasm $< $@

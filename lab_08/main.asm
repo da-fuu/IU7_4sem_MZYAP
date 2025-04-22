@@ -2,6 +2,7 @@ format ELF64
 
 public main
 
+
 extrn InitWindow
 extrn WindowShouldClose
 extrn BeginDrawing
@@ -12,7 +13,8 @@ extrn GuiLabel
 extrn GuiSetStyle
 extrn GuiValueBox
 extrn ClearBackground
-extrn sprintf
+extrn 'sprintf' as _sprintf
+sprintf equ PLT _sprintf
 
 struc rect x,y,w,h
 {
@@ -35,7 +37,7 @@ main:
     push rbp
     mov rdi, 700
     mov rsi, 200
-    mov rdx, name
+    lea rdx, [name]
     call InitWindow
 
     mov rdi, 60
@@ -72,8 +74,8 @@ mainloop:
     mov rdi, 0
     call ClearBackground
 
-    mov rdi, input_text
-    mov rsi, val
+    lea rdi, [input_text]
+    lea rsi, [val]
     mov rdx, 0
     mov rcx, 0
     mov r8, 1
@@ -98,14 +100,14 @@ mainloop:
     mov [ans], 0
     .skip:
 
-    mov rdi, buf
-    mov rsi, output_text_fmt
+    lea rdi, [buf]
+    lea rsi, [output_text_fmt]
     mov rdx, 0
     mov eax, [ans]
     bts edx, eax
     call sprintf
 
-    mov rdi, buf
+    lea rdi, [buf]
     pass_rect output_rect
     call GuiLabel
 
