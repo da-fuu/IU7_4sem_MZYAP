@@ -26,13 +26,13 @@ $(OUT_DIR)/%fp.o : %fp.c opsfp.h
 2 : 2.elf
 
 2.elf : $(OUT_DIR)/sin.o
-	gcc $< -no-pie -o $@
+	gcc $< -o $@
 
 
 3 : 3.elf
 
 3.elf : $(OUT_DIR)/findroot.o
-	gcc $< -no-pie -o $@
+	gcc $< -o $@
 
 
 $(OUT_DIR)/%.o : %.asm
