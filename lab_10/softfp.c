@@ -3,9 +3,24 @@
 
 unsigned long long soft_addf(float a, float b)
 {
+    float c;
+    
     unsigned long long start = __rdtsc();
 
-    float c = a + b;
+    for (int i = 0; i < INSIDE; ++i)
+    {
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+    }
+    
 
     unsigned long long stop = __rdtsc();
 
@@ -14,9 +29,24 @@ unsigned long long soft_addf(float a, float b)
 
 unsigned long long soft_addd(double a, double b)
 {
+    double c;
+    
     unsigned long long start = __rdtsc();
 
-    double c = a + b;
+    for (int i = 0; i < INSIDE; ++i)
+    {
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+        c = a + b;
+    }
+    
 
     unsigned long long stop = __rdtsc();
 
@@ -25,9 +55,24 @@ unsigned long long soft_addd(double a, double b)
 
 unsigned long long soft_mulf(float a, float b)
 {
+    float c;
+    
     unsigned long long start = __rdtsc();
 
-    float c = a * b;
+    for (int i = 0; i < INSIDE; ++i)
+    {
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+    }
+    
 
     unsigned long long stop = __rdtsc();
 
@@ -36,9 +81,24 @@ unsigned long long soft_mulf(float a, float b)
 
 unsigned long long soft_muld(double a, double b)
 {
+    double c;
+    
     unsigned long long start = __rdtsc();
 
-    double c = a * b;
+    for (int i = 0; i < INSIDE; ++i)
+    {
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+        c = a * b;
+    }
+    
 
     unsigned long long stop = __rdtsc();
 

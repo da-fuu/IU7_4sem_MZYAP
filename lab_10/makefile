@@ -1,5 +1,5 @@
 OUT_DIR := out
-CFLAGS := --std=c99 -Wall -Wpedantic -Wextra -Wno-unused-variable -g -O0 -masm=intel
+CFLAGS := --std=c99 -Wall -Wpedantic -Wextra -Wno-unused-variable -Wno-unused-but-set-variable -g -O0 -masm=intel
 
 SRCS := $(wildcard *fp.c)
 

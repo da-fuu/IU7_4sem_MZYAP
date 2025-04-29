@@ -1,5 +1,9 @@
 #pragma once
 
+#define TESTS 3000
+#define INSIDE 1000
+
+
 unsigned long long hard_addf(float a, float b);
 unsigned long long hard_addd(double a, double b);
 
