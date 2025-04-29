@@ -40,24 +40,24 @@ main:
     lea rdi, [best]
     call print_res
 
-    mov [rsp], word 2 
+    mov [rsp], dword 2.0 
 
     fld [PI_BAD]
-    fild word [rsp]
+    fld dword [rsp]
     fdivp
     fsin
     lea rdi, [bad2]
     call print_res
 
     fld [PI_MID]
-    fild word [rsp]
+    fld dword [rsp]
     fdivp
     fsin
     lea rdi, [mid2]
     call print_res
 
     fldpi
-    fild word [rsp]
+    fld dword [rsp]
     fdivp
     fsin
     lea rdi, [best2]
