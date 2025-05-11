@@ -4,16 +4,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-void change_brightness_std(unsigned char *data, int len, float brightness)
-{
-    for (int i = 0; i < len; i++)
-    {
-        if (brightness > 0.5f)
-                data[i] = (unsigned char)(255.0f - (255.0f - (float)data[i]) * (2.0f - brightness * 2.0f));
-        else if (brightness < 0.5f)
-            data[i] = (unsigned char)((float)data[i] * brightness * 2.0f);
-    }
-}
+// void change_brightness_std(unsigned char *data, int len, float brightness)
+// {
+//     for (int i = 0; i < len; i++)
+//     {
+//         if (brightness > 0.5f)
+//                 data[i] = (unsigned char)(255.0f - (255.0f - (float)data[i]) * (2.0f - brightness * 2.0f));
+//         else if (brightness < 0.5f)
+//             data[i] = (unsigned char)((float)data[i] * brightness * 2.0f);
+//     }
+// }
 
 extern void change_brightness_asm(unsigned char *data, int len, float brightness);
 
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     
     int width, height, channels;
     
-    unsigned char *data = stbi_load(argv[2], &width, &height, &channels, 3);
+    unsigned char *data = stbi_load(argv[2], &width, &height, &channels, 0);
     if (data == NULL)
     {
         puts("Ошибка открытия изображения");
