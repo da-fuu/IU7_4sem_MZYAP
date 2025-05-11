@@ -1,5 +1,5 @@
 OUT_DIR := out
-CFLAGS := --std=c99 -Wall -Wpedantic -Wextra -g -O0
+CFLAGS := --std=c99 -Wall -Wpedantic -Wextra -g -O3
 
 
 all : app.elf gui.elf
@@ -17,7 +17,7 @@ gui.elf : $(OUT_DIR)/gui.o $(OUT_DIR)/brightness.o
 	gcc $^ -L. -lraylib -lm -o $@
 
 $(OUT_DIR)/gui.o : gui.c
-	gcc $(CFLAGS) -O3 -c $< -o $@
+	gcc $(CFLAGS) -c $< -o $@
 
 clean :
 	$(RM) ./*.elf $(OUT_DIR)/*

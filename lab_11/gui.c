@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "raylib.h"
 
 extern void change_brightness_asm(unsigned char *data, int len, float brightness);
@@ -18,14 +20,14 @@ int main(int argc, char **argv)
         puts("Ошибка открытия изображения");
         return 2;
     }
-    Image copy;
+    int len = image.height * image.width * (image.format == PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 ? 4 : 3);
+    void *copy = malloc(len);
     Texture2D texture;
-    
-    Vector2 mouse;
+
+    float mouse;
     float brightness = 0.5f;
 
     InitWindow(image.width, image.height, "GUI");
-    int len = image.height * image.width * (image.format == PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 ? 4 : 3);
     SetTargetFPS(60);
     texture = LoadTextureFromImage(image);
     while (!WindowShouldClose())
@@ -33,8 +35,9 @@ int main(int argc, char **argv)
         BeginDrawing();
         ClearBackground(BLACK);
 
-        mouse = GetMouseWheelMoveV();
-        brightness -= mouse.y / 100.0f;
+        mouse = GetMouseWheelMove();
+        if (mouse != 0.0f)
+            brightness -= mouse / 100.0f;
         if (IsKeyDown(KEY_UP))
             brightness += 0.003f;
         if (IsKeyDown(KEY_DOWN))
@@ -45,19 +48,14 @@ int main(int argc, char **argv)
         else if (brightness > 1.0f)
             brightness = 1.0f;
         
-        copy = ImageCopy(image);
-        change_brightness_asm(copy.data, len, brightness);
+        memcpy(copy, image.data, len);
+        change_brightness_asm(copy, len, brightness);
         
-        UpdateTexture(texture, copy.data);
+        UpdateTexture(texture, copy);
         DrawTexture(texture, 0, 0, WHITE);
-
-        UnloadImage(copy);
         
         EndDrawing();
     }
     
-    
-    
-        
     return 0;
 }
