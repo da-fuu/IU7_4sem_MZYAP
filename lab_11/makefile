@@ -1,5 +1,5 @@
 OUT_DIR := out
-CFLAGS := --std=c99 -Wall -Wpedantic -Wextra -g -O3
+CFLAGS := --std=c99 -Wall -Wpedantic -Wextra -g -O3 -march=native
 
 
 all : app.elf gui.elf

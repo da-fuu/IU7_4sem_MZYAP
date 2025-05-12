@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <x86intrin.h>
 #include "raylib.h"
 
 extern void change_brightness_asm(unsigned char *data, int len, float brightness);
@@ -28,7 +29,8 @@ int main(int argc, char **argv)
     float brightness = 0.5f;
 
     InitWindow(image.width, image.height, "GUI");
-    SetTargetFPS(60);
+    // SetTargetFPS(60);
+    unsigned long long before, after;
     texture = LoadTextureFromImage(image);
     while (!WindowShouldClose())
     {
@@ -47,9 +49,13 @@ int main(int argc, char **argv)
             brightness = 0.0f;
         else if (brightness > 1.0f)
             brightness = 1.0f;
-        
+
+        before = __rdtsc();
+        printf("else %llu\n", before - after);
         memcpy(copy, image.data, len);
         change_brightness_asm(copy, len, brightness);
+        after = __rdtsc();
+        printf("this %llu\n", after - before);
         
         UpdateTexture(texture, copy);
         DrawTexture(texture, 0, 0, WHITE);
