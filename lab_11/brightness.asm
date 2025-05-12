@@ -49,15 +49,15 @@ macro decrease_brightness
     vaddss xmm0, xmm0, xmm0
     vbroadcastss ymm2, xmm0
     
-    mov rcx, rsi
     .loop_dec:
  
         unpack
         vmulps ymm1, ymm1, ymm2
         pack
         
-        add rdi, 8
-    loop .loop_dec
+    add rdi, 8
+    dec rsi
+    jnz .loop_dec
     
     cmp rdx, 0
     je .end_dec     
@@ -85,7 +85,6 @@ macro increase_brightness
     mov dword [rsp], 255.0
     vbroadcastss ymm3, dword [rsp]
         
-    mov rcx, rsi
     .loop_inc:
     
         unpack
@@ -95,7 +94,8 @@ macro increase_brightness
         pack
         
         add rdi, 8
-    loop .loop_inc
+    dec rsi
+    jnz .loop_inc
     
     cmp rdx, 0
     je .end_inc     

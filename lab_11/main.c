@@ -15,7 +15,7 @@
 //     }
 // }
 
-extern void change_brightness_asm(unsigned char *data, int len, float brightness);
+extern void change_brightness_asm(unsigned char *data, size_t len, float brightness);
 
 int main(int argc, char **argv)
 {
