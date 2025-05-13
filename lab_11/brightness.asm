@@ -24,8 +24,10 @@ macro pack ; выгружает из ymm1 8 float в 8 байт по адрес�
     vmovq qword [rdi], xmm0
 }
 
-macro move_to_stack
+macro move_to_stack ; копирует rdx байт из [rdi] в [rsp], сохраняет rdi в rax, rsp в rdi, измененные регистры - rcx, rsi
 {
+    mov dword [rsp], 0
+
     cld
     mov rcx, rdx
     mov rax, rdi
@@ -35,7 +37,7 @@ macro move_to_stack
     mov rdi, rsp
 }
 
-macro move_from_stack
+macro move_from_stack ; копирует rdx байт из [rsp] в [rax], измененные регистры - rcx, rsi, rdi
 {
     cld
     mov rcx, rdx
@@ -45,35 +47,48 @@ macro move_from_stack
 }
 
 
-macro decrease_brightness
+macro apply_linear_to_8 mode ; применяет функцию ymm2 * x [+ ymm3], mode - нужно ли сложение, вход и выход - 8 байт в [rdi], измененные регистры - ymm0-1
+{
+    unpack
+    
+    vmulps ymm1, ymm1, ymm2
+    if mode = 1
+        vaddps ymm1, ymm1, ymm3
+    end if
+    
+    pack
+}
+
+macro apply_linear mode ; применяет функцию ymm2 * x [+ ymm3], mode - нужно ли сложение, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
+{
+    .loop_#mode:
+     
+        apply_linear_to_8 mode
+        
+    add rdi, 8
+    dec rsi
+    jnz .loop_#mode
+    
+    cmp rdx, 0
+    je .end_#mode     
+        move_to_stack
+        
+        apply_linear_to_8 mode
+           
+        move_from_stack
+            
+    .end_#mode:
+}
+
+macro decrease_brightness ; уменьшает яркость до xmm0 в массиве, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
 {
     vaddss xmm0, xmm0, xmm0
     vbroadcastss ymm2, xmm0
     
-    .loop_dec:
- 
-        unpack
-        vmulps ymm1, ymm1, ymm2
-        pack
-        
-    add rdi, 8
-    dec rsi
-    jnz .loop_dec
-    
-    cmp rdx, 0
-    je .end_dec     
-        move_to_stack
-        
-        unpack
-        vmulps ymm1, ymm1, ymm2
-        pack
-           
-        move_from_stack
-            
-    .end_dec:
+    apply_linear 0
 }
 
-macro increase_brightness
+macro increase_brightness ; увеличивает яркость до xmm0 в массиве, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
 {
     mov dword [rsp], 2.0
     vmovss xmm1, dword [rsp]
@@ -88,32 +103,10 @@ macro increase_brightness
     vmulps ymm0, ymm3, ymm2
     vsubps ymm3, ymm3, ymm0
         
-    .loop_inc:
-    
-        unpack
-        vmulps ymm1, ymm1, ymm2
-        vaddps ymm1, ymm1, ymm3
-        pack
-        
-        add rdi, 8
-    dec rsi
-    jnz .loop_inc
-    
-    cmp rdx, 0
-    je .end_inc     
-        move_to_stack
-        
-        unpack
-        vmulps ymm1, ymm1, ymm2
-        vaddps ymm1, ymm1, ymm3
-        pack
-           
-        move_from_stack
-            
-    .end_inc:
+    apply_linear 1
 }
 
-change_brightness_asm:
+change_brightness_asm: ; SysV abi функция (uint8_t *data, size_t len, float brightness)
     push rbp
     mov rbp, rsp
     

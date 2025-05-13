@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
     float mouse;
     float brightness = 0.5f;
+    bool changed = true;
 
     InitWindow(image.width, image.height, argv[1]);
     SetTargetFPS(60);
@@ -52,6 +53,7 @@ int main(int argc, char **argv)
             SetWindowSize(image.width, image.height);
             SetWindowTitle(files.paths[0]);
             UnloadDroppedFiles(files);
+            changed = true;
         }
         
         BeginDrawing();
@@ -59,25 +61,38 @@ int main(int argc, char **argv)
 
         mouse = GetMouseWheelMove();
         if (mouse != 0.0f)
+        {
             brightness -= mouse / 75.0f;
+            changed = true;
+        }
         if (IsKeyDown(KEY_UP))
+        {
             brightness += 0.005f;
+            changed = true;
+        }
         if (IsKeyDown(KEY_DOWN))
+        {
             brightness -= 0.005f;
+            changed = true;
+        }
 
-        if (brightness < 0.0f)
-            brightness = 0.0f;
-        else if (brightness > 1.0f)
-            brightness = 1.0f;
+        if (changed)
+        {
+            if (brightness < 0.0f)
+                brightness = 0.0f;
+            else if (brightness > 1.0f)
+                brightness = 1.0f;
+            
+            memcpy(copy, image.data, len);
+            // before = __rdtsc();
+            // printf("else %llu\n", before - after);
+            change_brightness_asm(copy, len, brightness);
+            // after = __rdtsc();
+            // printf("this %llu\n", after - before);
 
-        memcpy(copy, image.data, len);
-        // before = __rdtsc();
-        // printf("else %llu\n", before - after);
-        change_brightness_asm(copy, len, brightness);
-        // after = __rdtsc();
-        // printf("this %llu\n", after - before);
-        
-        UpdateTexture(texture, copy);
+            UpdateTexture(texture, copy);
+            changed = false;
+        }
         DrawTexture(texture, 0, 0, WHITE);
         
         EndDrawing();
