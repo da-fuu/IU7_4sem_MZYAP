@@ -37,6 +37,7 @@ macro move_to_stack
 
 macro move_from_stack
 {
+    cld
     mov rcx, rdx
     mov rsi, rsp
     mov rdi, rax 
@@ -84,13 +85,14 @@ macro increase_brightness
     
     mov dword [rsp], 255.0
     vbroadcastss ymm3, dword [rsp]
+    vmulps ymm0, ymm3, ymm2
+    vsubps ymm3, ymm3, ymm0
         
     .loop_inc:
     
         unpack
-        vsubps ymm1, ymm3, ymm1
         vmulps ymm1, ymm1, ymm2
-        vsubps ymm1, ymm3, ymm1
+        vaddps ymm1, ymm1, ymm3
         pack
         
         add rdi, 8
@@ -102,9 +104,8 @@ macro increase_brightness
         move_to_stack
         
         unpack
-        vsubps ymm1, ymm3, ymm1
         vmulps ymm1, ymm1, ymm2
-        vsubps ymm1, ymm3, ymm1
+        vaddps ymm1, ymm1, ymm3
         pack
            
         move_from_stack
