@@ -5,22 +5,6 @@ public change_brightness_asm
 ; rdi data   rsi len   xmm0 bright
 section '.text' executable
    
-macro unpack ; загружает в ymm1 8 байт по адресу rdi в виде float
-{
-    vpmovzxbd ymm0, qword [rdi]
-    vcvtdq2ps ymm1, ymm0
-}
-
-macro pack ; выгружает из ymm1 8 float в 8 байт по адресу rdi
-{
-    vcvtps2dq ymm0, ymm1
-        
-    vextracti128 xmm1, ymm0, 1
-    vpackusdw xmm0, xmm0, xmm1
-    vpackuswb xmm0, xmm0, xmm0 
-    
-    vmovq qword [rdi], xmm0
-}
 
 macro move_to_stack ; копирует rdx байт из [rdi] в [rsp], сохраняет rdi в rax, rsp в rdi, измененные регистры - rcx, rsi
 {
@@ -47,26 +31,33 @@ macro move_from_stack ; копирует rdx байт из [rsp] в [rax], из�
 
 macro apply_linear_to_8 ; применяет функцию ymm2 * x + ymm3, вход и выход - 8 байт в [rdi], измененные регистры - ymm0-1
 {
-    unpack
+    vpmovzxbd ymm0, qword [rdi]
+    vcvtdq2ps ymm1, ymm0
+        
     vfmadd213ps ymm1, ymm2, ymm3
-    pack
+    
+    vcvtps2dq ymm0, ymm1    
+    vextracti128 xmm1, ymm0, 1
+    vpackusdw xmm0, xmm0, xmm1
+    vpackuswb xmm0, xmm0, xmm0 
+    vmovq qword [rdi], xmm0
 }
 
 macro apply_linear ; применяет функцию ymm2 * x + ymm3, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
 {
-    .loop_#mode:
+    .loop_linear:
         apply_linear_to_8
     add rdi, 8
     dec rsi
-    jnz .loop_#mode
+    jnz .loop_linear
     
     cmp rdx, 0
-    je .end_#mode     
+    je .end_linear     
         move_to_stack
         apply_linear_to_8
         move_from_stack
             
-    .end_#mode:
+    .end_linear:
 }
 
 macro decrease_brightness ; уменьшает яркость до xmm0 в массиве, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
