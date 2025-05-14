@@ -17,9 +17,7 @@ macro pack ; выгружает из ymm1 8 float в 8 байт по адрес�
         
     vextracti128 xmm1, ymm0, 1
     vpackusdw xmm0, xmm0, xmm1
-    
-    vpshufd xmm1, xmm0, 01001110b
-    vpackuswb xmm0, xmm0, xmm1 
+    vpackuswb xmm0, xmm0, xmm0 
     
     vmovq qword [rdi], xmm0
 }
@@ -47,24 +45,17 @@ macro move_from_stack ; копирует rdx байт из [rsp] в [rax], из�
 }
 
 
-macro apply_linear_to_8 mode ; применяет функцию ymm2 * x [+ ymm3], mode - нужно ли сложение, вход и выход - 8 байт в [rdi], измененные регистры - ymm0-1
+macro apply_linear_to_8 ; применяет функцию ymm2 * x + ymm3, вход и выход - 8 байт в [rdi], измененные регистры - ymm0-1
 {
     unpack
-    
-    vmulps ymm1, ymm1, ymm2
-    if mode = 1
-        vaddps ymm1, ymm1, ymm3
-    end if
-    
+    vfmadd213ps ymm1, ymm2, ymm3
     pack
 }
 
-macro apply_linear mode ; применяет функцию ymm2 * x [+ ymm3], mode - нужно ли сложение, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
+macro apply_linear ; применяет функцию ymm2 * x + ymm3, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
 {
     .loop_#mode:
-     
-        apply_linear_to_8 mode
-        
+        apply_linear_to_8
     add rdi, 8
     dec rsi
     jnz .loop_#mode
@@ -72,9 +63,7 @@ macro apply_linear mode ; применяет функцию ymm2 * x [+ ymm3], m
     cmp rdx, 0
     je .end_#mode     
         move_to_stack
-        
-        apply_linear_to_8 mode
-           
+        apply_linear_to_8
         move_from_stack
             
     .end_#mode:
@@ -84,8 +73,7 @@ macro decrease_brightness ; уменьшает яркость до xmm0 в ма�
 {
     vaddss xmm0, xmm0, xmm0
     vbroadcastss ymm2, xmm0
-    
-    apply_linear 0
+    vpxor ymm3, ymm3, ymm3
 }
 
 macro increase_brightness ; увеличивает яркость до xmm0 в массиве, вход и выход - rsi*8 + rdx байт в [rdi], измененные регистры - много
@@ -102,8 +90,6 @@ macro increase_brightness ; увеличивает яркость до xmm0 в �
     vbroadcastss ymm3, dword [rsp]
     vmulps ymm0, ymm3, ymm2
     vsubps ymm3, ymm3, ymm0
-        
-    apply_linear 1
 }
 
 change_brightness_asm: ; SysV abi функция (uint8_t *data, size_t len, float brightness)
@@ -129,6 +115,8 @@ change_brightness_asm: ; SysV abi функция (uint8_t *data, size_t len, flo
         increase_brightness
     
     .end:
+    apply_linear
+    
     mov rsp, rbp
     pop rbp
     ret
