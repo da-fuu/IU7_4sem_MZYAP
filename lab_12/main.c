@@ -17,37 +17,41 @@ __asm__ volatile (
     return ans;
 }
 
-float dot(const float *a, const float *b, size_t l)
+double dot(const double *a, const double *b, size_t l)
 {
-    float out;
+    double out;
 __asm__ volatile (
-        "fmov s2, wzr\n"
-        "dup v2.4s, v2.s[0]\n"
+        "fmov d3, xzr\n"
+        "dup v3.2d, v3.d[0]\n"
         "loop_neon:\n"
-        "ld1 {v0.4s}, [%x[a]], #16\n"
-        "ld1 {v1.4s}, [%x[b]], #16\n"
-        "fmla v2.4s, v0.4s, v1.4s\n"
-        "subs %x[l], %x[l], #4\n"
+        "ld1 {v1.2d}, [%x[a]], #16\n"
+        "ld1 {v2.2d}, [%x[b]], #16\n"
+        "fmla v3.2d, v1.2d, v2.2d\n"
+        "sub %x[l], %x[l], #2\n"
+        "cmp %x[l], #1\n"
         "bgt loop_neon\n"
-        "faddp v0.4s, v2.4s, v2.4s\n"
-        "faddp s0, v0.2s\n"
-        "str s0, %x[out]\n"
-        : [out] "=m" (out)
+        "faddp %d[out], v3.2d\n"
+        "cbz %x[l], end\n"
+        "ld1 {v1.1d}, [%x[a]]\n"
+        "ld1 {v2.1d}, [%x[b]]\n"
+        "fmla %d[out], d1, v2.d[0]\n"
+        "end:\n"
+        : [out] "=&w" (out)
         : [a] "r" (a), [b] "r" (b), [l] "r" (l)
-        : "memory"
+        : "memory", "v1", "v2", "v3"
     );
+    return out;
 }
-
 
 
 int main(void) {
     const char *str = "Aboba";
     printf("Длина строки \'%s\' = %zu\n", str, len(str));
 
-    float a[] = {0, 1, 2, 3};
-    float b[] = {0.5, 0.1, 2.4, 3.0};
+    double a[] = {0, 1, 2, 3, -4.2};
+    double b[] = {0.5, 0.1, 2.4, 3.0, 0.7};
 
-    float prod = dot(a, b, 4);
+    double prod = dot(a, b, 5);
 
     printf("Скалярное произведение векторов a и b = %f\n", prod);
     
